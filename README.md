@@ -14,12 +14,12 @@ Alternatively, you can place the scripts in `/usr/local/bin` so that they can be
 ## How to Annotate Source Files ##
 | Tag | Meaning |
 | --- | ------- |
-| `#start-page#`  | indicates the start of a markdown page |
-| `#end-page#`    | indicates the end of a markdown page |
-| `#start-text#`  | indicates the start of a text block |
-| `#end-text#`    | indicates the end of a text block |
-| `#start-ignore#`| indicates the start of an ignored section |
-| `#end-ignore#`  | indicates the end of an ignored section |
+| `#start-page#`  | Indicates the start of a markdown page |
+| `#end-page#`    | Indicates the end of a markdown page |
+| `#start-text#`  | Indicates the start of a text block |
+| `#end-text#`    | Indicates the end of a text block |
+| `#start-ignore#`| Indicates the start of an ignored section |
+| `#end-ignore#`  | Indicates the end of an ignored section |
 
 - The page-start defaults to the first line of the code, and page-end defaults to the last line. Anything before the page-start is ignored, and anything after the page-end is ignored.
 - Standard markdown can be used within text blocks, e.g. `# Heading` indicates a heading, `**Word**` indicates an emphasised word etc.
