@@ -1,0 +1,164 @@
+#!/usr/bin/python
+
+##################################################################
+'''
+This script converts a source file (of any language) to a      
+Markdown file which is annotated in a kind of blog style, e.g. 
+http://pacman.blog.br/blog/2012/12/29/spell-correct-in-gawk/   
+
+To represent a text section in your source code, within a 
+a comment, put "#begin-text#" and to close the text, use
+"#end-text#" (both without quotes).
+
+For example, in Java, use:
+/*#begin-text#
+This is some text 
+#end-text#*/
+
+To signify where your blog/tutorial/page should start and/or end, 
+e.g. if you don't want to include the import statements at the start 
+of your code, use "#start-page#" and "#end-page#" in a similar way.
+start-page defaults to the start of the document
+end-page defaults to the end of the document
+
+To ignore a section of code, use #start-ignore# and #end-ignore# as usual.
+'''
+##################################################################
+
+import sys, textwrap, re
+
+def line_index_of(pattern, lines):
+    n = 0
+    for line in lines:
+        if pattern in line:
+            return n
+        n += 1
+
+    return -1
+
+def formatBlock(block):
+    '''Format the given block of text, trimming leading/trailing
+        empty lines and any leading whitespace that is common to all lines.
+        The purpose is to let us list a code block as a multiline,
+        triple-quoted Python string, taking care of indentation concerns.'''
+    # separate block into lines
+    lines = str(block).split('\n')
+    # remove leading/trailing empty lines
+    while lines and not lines[0].strip():  del lines[0]
+    while lines and not lines[-1].strip(): del lines[-1]
+
+    if not lines: return ""
+
+    # look at first line to see how much indentation to trim
+    ws = re.match(r'\s*',lines[0]).group(0)
+    if ws:
+        lines = map( lambda x: x.replace(ws,'',1), lines )
+    # remove leading/trailing blank lines (after leading ws removal)
+    # we do this again in case there were pure-whitespace lines
+    while lines and not lines[0]:  del lines[0]
+    while lines and not lines[-1]: del lines[-1]
+    return '\n'.join(lines)+'\n'
+
+def print_err(line_num, message):
+    print("line: " + str(line_num) + ": " + message)
+
+del sys.argv[0] # the first argument is just the program name
+
+if len(sys.argv) != 2:
+    print("Usage: ./auto-tutorial <file> <language>")
+    sys.exit(1)
+
+filename = sys.argv[0]
+language = sys.argv[1]
+
+f = open(filename, "r")
+lines = f.readlines()
+f.close()
+
+global_line = 0
+
+page_start = max(0, line_index_of("#start-page#", lines))
+
+page_end_line = line_index_of("#end-page#", lines)
+if page_end_line >= 0:
+    page_end = page_end_line
+else:
+    page_end = len(lines) - 1
+
+if (page_start > page_end):
+    print("Page start is after page end")
+    sys.exit(1)
+
+page_start += 1 # skip the line where it starts
+page_end -= 1 # skip the line where it ends
+
+# Find the next non-whitespace line
+while lines[page_start].strip() == "":
+    page_start += 1
+
+global_line = page_start
+
+# Find the last non-whitespace line before the end
+while lines[page_end].strip() == "":
+    page_end -= 1
+
+lines = lines[page_start:page_end+1]
+
+ignoring = False
+texting = False
+text_start = -1
+text_end = -1
+i = 0
+code_encountered = False
+
+for line in lines:
+    if "#start-ignore#" in line:
+        ignoring = True
+        if code_encountered:
+            # Write all previous lines as code
+            print("```" + language)
+            print(formatBlock("".join(lines[text_end+1:i])))
+            print("```\n")
+            code_encountered = False
+    elif "#end-ignore#" in line:
+        if ignoring:
+            ignoring = False
+            text_end = i
+        else:
+            print_err(global_line, "#end-ignore# with no #start-ignore#")
+            sys.exit(1)
+    elif not ignoring:
+        if "#start-text#" in line:
+            texting = True
+            text_start = i
+            if code_encountered:
+                # Write all previous lines as code
+                print("```" + language)
+                print(formatBlock("".join(lines[text_end+1:i])))
+                print("```\n")
+                code_encountered = False
+        elif "#end-text#" in line:
+            if texting:
+                texting = False
+                # Write all lines between #start-text# and #end-text#
+                print(formatBlock("".join(lines[text_start+1:i])))
+                text_end = i
+                code_encountered = False
+            else:
+                print_err(global_line, "#end-text# with no #start-text#")
+                sys.exit(1)
+        elif line.strip():
+            code_encountered = True
+    i += 1
+    global_line += 1
+
+if ignoring:
+    print_err(global_line, "#start-ignore# block not closed")
+elif texting:
+    print_err(global_line, "#start-text# block not closed")
+elif text_end < len(lines) - 1:
+    # Write any code left
+    print("```" + language)
+    print(formatBlock("".join(lines[text_end+1:i])).rstrip())
+    print("```\n")
+

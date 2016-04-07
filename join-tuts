@@ -1,0 +1,16 @@
+#!/bin/bash
+
+#############################################################
+# Joins a number of 'tutorial' files (see ./auto-tutorial), # 
+# putting a page break between each one                     #
+# Usage: ./join-tuts <language> <file...>
+#############################################################
+
+language=$1
+
+shift # ignores first argument
+
+for f in "$@"; do
+  auto-tutorial $f $language
+  echo '$\pagebreak$' # Remove this line if not converting to pdf
+done
