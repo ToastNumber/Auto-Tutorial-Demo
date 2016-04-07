@@ -6,6 +6,27 @@ To provide an easy way to produce a blog-like document from a source file. For e
 
 If certain parts of the conversion are awkward, e.g. indentation of braces on the last line, then you can always just modify the markdown file directly after conversion.
 
+## Workflow ##
+Place the scripts in the root of your workspace. To produce markdown versions of your annotated source files, modify the Makefile/Bash script appropriately and then run it.
+
+Alternatively, you can place the scripts in `/usr/local/bin` so that they can be run from anywhere (then modify the Makefile/Bash script by removing the `./` prefix).
+
+## How to Annotate Source Files ##
+| Tag | Meaning |
+| --- | ------- |
+| `#start-page#`  | indicates the start of a markdown page |
+| `#end-page#`    | indicates the end of a markdown page |
+| `#start-text#`  | indicates the start of a text block |
+| `#end-text#`    | indicates the end of a text block |
+| `#start-ignore#`| indicates the start of an ignored section |
+| `#end-ignore#`  | indicates the end of an ignored section |
+
+- The page-start defaults to the first line of the code, and page-end defaults to the last line. Anything before the page-start is ignored, and anything after the page-end is ignored.
+- Standard markdown can be used within text blocks, e.g. `# Heading` indicates a heading, `**Word**` indicates an emphasised word etc.
+- Anything between `#start-ignore#` and `#end-ignore#` is ignored.
+
+Please see the example files.
+
 ## Explanation of the scripts ##
 
 ### `auto-tutorial` ###
@@ -28,23 +49,4 @@ This is mostly a convenience script. It takes a list of source files, converts t
 ### `Makefile`/`prettify` ###
 These are convenience scripts which need to be modified. Simply running `make` or `./prettify` will convert all specified files to markdown and then generate a pdf.
 
-## Workflow ##
-Place the scripts in the root of your workspace. To produce markdown versions of your annotated source files, modify the Makefile/Bash script appropriately and then run it.
 
-Alternatively, you can place the scripts in `/usr/local/bin` so that they can be run from anywhere (then modify the Makefile/Bash script by removing the `./` prefix).
-
-## How to Annotate Source Files ##
-| Tag | Meaning |
-| --- | ------- |
-| `#start-page#`  | indicates the start of a markdown page |
-| `#end-page#`    | indicates the end of a markdown page |
-| `#start-text#`  | indicates the start of a text block |
-| `#end-text#`    | indicates the end of a text block |
-| `#start-ignore#`| indicates the start of an ignored section |
-| `#end-ignore#`  | indicates the end of an ignored section |
-
-- The page-start defaults to the first line of the code, and page-end defaults to the last line. Anything before the page-start is ignored, and anything after the page-end is ignored.
-- Standard markdown can be used within text blocks, e.g. `# Heading` indicates a heading, `**Word**` indicates an emphasised word etc.
-- Anything between `#start-ignore#` and `#end-ignore#` is ignored.
-
-Please see the example files.
