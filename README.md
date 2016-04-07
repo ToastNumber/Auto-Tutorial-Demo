@@ -1,4 +1,4 @@
-# Auto-Tutorial Demonstration #
+# Tutorializer #
 This repository contains some files as a demonstration of how annotated source files can be converted to readable markdown/pdf files. (Please forgive the bad python programming).
 
 ## Motivation ##
