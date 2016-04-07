@@ -1,5 +1,4 @@
 # Tutorializer #
-![](output/pdf-img.png)
 
 This repository contains some files as a demonstration of how annotated source files can be converted to readable markdown/pdf files. (Please forgive the bad python programming).
 
@@ -51,4 +50,7 @@ This is mostly a convenience script. It takes a list of source files, converts t
 ### `Makefile`/`prettify` ###
 These are convenience scripts which need to be modified. Simply running `make` or `./prettify` will convert all specified files to markdown and then generate a pdf.
 
+## Example ##
+*There is also a markdown version in the `output` folder which can be viewed directly on GitHub*.
 
+![](output/pdf-img.png)
